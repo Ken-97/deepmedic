@@ -1,0 +1,10 @@
+/vol/bitbucket/lizhq219/deepMedicSemi/data/MultiorganAbdominalCT/images/20/Channel_0/img0031_reoriented.nii.gz
+/vol/bitbucket/lizhq219/deepMedicSemi/data/MultiorganAbdominalCT/images/21/Channel_0/img0032_reoriented.nii.gz
+/vol/bitbucket/lizhq219/deepMedicSemi/data/MultiorganAbdominalCT/images/22/Channel_0/img0033_reoriented.nii.gz
+/vol/bitbucket/lizhq219/deepMedicSemi/data/MultiorganAbdominalCT/images/23/Channel_0/img0034_reoriented.nii.gz
+/vol/bitbucket/lizhq219/deepMedicSemi/data/MultiorganAbdominalCT/images/24/Channel_0/img0035_reoriented.nii.gz
+/vol/bitbucket/lizhq219/deepMedicSemi/data/MultiorganAbdominalCT/images/25/Channel_0/img0036_reoriented.nii.gz
+/vol/bitbucket/lizhq219/deepMedicSemi/data/MultiorganAbdominalCT/images/26/Channel_0/img0037_reoriented.nii.gz
+/vol/bitbucket/lizhq219/deepMedicSemi/data/MultiorganAbdominalCT/images/27/Channel_0/img0038_reoriented.nii.gz
+/vol/bitbucket/lizhq219/deepMedicSemi/data/MultiorganAbdominalCT/images/28/Channel_0/img0039_reoriented.nii.gz
+/vol/bitbucket/lizhq219/deepMedicSemi/data/MultiorganAbdominalCT/images/29/Channel_0/img0040_reoriented.nii.gz
