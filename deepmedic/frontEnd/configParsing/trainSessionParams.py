@@ -67,6 +67,20 @@ class TrainSessionParameters(object):
     errReqGtTr = errorRequireGtLabelsTraining
 
     @staticmethod
+    def errorRequireULChannelsTraining():
+        print(
+            "ERROR: Parameter \"ULChannelsTraining\" needed but not provided in config file."
+            "This parameter should provide paths to unlabelled files, as many as the channels (modalities) of the task. "
+            "Each of the files should contain a list of paths, one for each case to train on. "
+            "These paths in a file should point to the .nii(.gz) files that are the corresponding channel for a "
+            "patient. Please provide it in the format: unlabelledChannelsTraining = [\"path-to-file-for-channel1\", ..., "
+            "\"path-to-file-for-channelN\"]. The paths should be given in quotes, separated by commas "
+            "(list of strings, python-style). Exiting.")
+        exit(1)
+
+    errReqULChansTr = errorRequireULChannelsTraining
+
+    @staticmethod
     def errorRequireBatchsizeTrain():
         print("ERROR: Please provide size of batch size in train-config. See parameter \'batchsize\'. Exiting.")
         exit(1)
@@ -213,6 +227,7 @@ class TrainSessionParameters(object):
             (self.channels_fpaths_tr,
              self.gt_fpaths_tr,
              self.roi_fpaths_tr,
+             self.ulChannels_fpaths_tr,
              _) = get_paths_from_df(self.log, self.dataframe_tr, os.path.dirname(self.csv_fname_train), req_gt=True)
         else:
             self.csv_fname_train = None
@@ -223,6 +238,8 @@ class TrainSessionParameters(object):
                 self.errReqGtTr()
 
             self.channels_fpaths_tr = parse_fpaths_of_channs_from_filelists(cfg[cfg.CHANNELS_TR], abs_path_cfg)
+            self.ulChannels_fpaths_tr = parse_fpaths_of_channs_from_filelists(cfg[cfg.UL_CHANNELS_TR], abs_path_cfg) \
+                if cfg[cfg.UL_CHANNELS_TR] is not None else None
             self.gt_fpaths_tr = parse_filelist(abs_from_rel_path(cfg[cfg.GT_LBLS_TR], abs_path_cfg), make_abs=True)
             self.roi_fpaths_tr = parse_filelist(abs_from_rel_path(cfg[cfg.ROIS_TR], abs_path_cfg), make_abs=True) \
                 if cfg[cfg.ROIS_TR] is not None else None
@@ -428,6 +445,7 @@ class TrainSessionParameters(object):
         # Others useful internally or for reporting:
         self.n_cases_tr = len(self.channels_fpaths_tr)
         self.n_cases_val = len(self.channels_fpaths_val)
+        self.n_cases_UL_tr = len(self.ulChannels_fpaths_tr)
         
         # ========= HIDDENS =============
         # no config allowed for these at the moment:
@@ -573,6 +591,7 @@ class TrainSessionParameters(object):
         logPrint("Filepaths to Channels of the Training Cases = " + str(self.channels_fpaths_tr))
         logPrint("Filepaths to Ground-Truth labels of the Training Cases = " + str(self.gt_fpaths_tr))
         logPrint("Filepaths to ROI Masks of the Training Cases = " + str(self.roi_fpaths_tr))
+        logPrint("Filepaths to Unlabelled Channels of the Training Cases = " + str(self.ulChannels_fpaths_tr))
 
         logPrint("~~ Sampling (train) ~~")
         logPrint("Type of Sampling = " + str(self.sampling_type_inst_tr.get_type_as_str()) +
@@ -745,7 +764,10 @@ class TrainSessionParameters(object):
                 
                 # -------- Pre-Processing ------
                 self.pad_input,
-                self.norm_prms
+                self.norm_prms,
+
+                # -------- Semi-Supervised ------
+                self.ulChannels_fpaths_tr
                 ]
         return args
 

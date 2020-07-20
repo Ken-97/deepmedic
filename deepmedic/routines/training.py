@@ -168,6 +168,10 @@ def do_training(sessionTf,
                 # -------- Pre-processing ------
                 pad_input,
                 norm_prms,
+
+                # ------- SemiSupervised ------
+                paths_per_ULchan_per_subj_train,
+
                 #--------- Sampling Hyperparamas -----
                 inp_shapes_per_path_train,
                 inp_shapes_per_path_val,

@@ -127,7 +127,12 @@ def get_paths_from_df(log, df, abs_path, req_gt=True):
     except KeyError:
         pred = None
 
-    return channels, gt, roi, pred
+    try:
+        ulChannels = [normfullpath(abs_path, p) for p in list(df['unlabelled_channels'])]
+    except KeyError:
+        ulChannels = None
+
+    return channels, gt, roi, pred, ulChannels
 
 
 def parse_fpaths_of_channs_from_filelists(list_of_filelists, abs_path_root):

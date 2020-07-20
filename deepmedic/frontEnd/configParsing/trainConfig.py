@@ -26,6 +26,7 @@ class TrainConfig(Config):
     CHANNELS_TR = "channelsTraining"
     GT_LBLS_TR = "gtLabelsTraining"
     ROIS_TR = "roiMasksTraining"
+    UL_CHANNELS_TR = "unlabelledChannelsTraining"
     
     # ~~~~ Sampling (training) ~~~~~
     TYPE_OF_SAMPLING_TR = "typeOfSamplingForTraining"
