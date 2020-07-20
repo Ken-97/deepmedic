@@ -1,0 +1,101 @@
+2020-7-20 5:8:55.99: =============================== logger created =======================================
+2020-7-20 5:8:55.99: 
+2020-7-20 5:8:55.99: ======================== Starting new session ============================
+2020-7-20 5:8:55.99: Command line arguments given: 
+Namespace(device='cuda', model_cfg='/vol/bitbucket/lizhq219/deepMedicSemi/deepmedic_semisuper/deepmedic/examples/configFiles/deepMedic/model/modelConfig_small_5train_semi.cfg', reset_trainer=False, saved_model=None, test_cfg=None, train_cfg='/vol/bitbucket/lizhq219/deepMedicSemi/deepmedic_semisuper/deepmedic/examples/configFiles/deepMedic/train/trainConfig_small_5train_semi.cfg')
+2020-7-20 5:8:57.97: Available devices to Tensorflow:
+[name: "/device:CPU:0"
+device_type: "CPU"
+memory_limit: 268435456
+locality {
+}
+incarnation: 12136371108073099212
+, name: "/device:XLA_CPU:0"
+device_type: "XLA_CPU"
+memory_limit: 17179869184
+locality {
+}
+incarnation: 3828076591011598534
+physical_device_desc: "device: XLA_CPU device"
+, name: "/device:GPU:0"
+device_type: "GPU"
+memory_limit: 11994670695
+locality {
+  bus_id: 1
+  links {
+  }
+}
+incarnation: 10789939841179763533
+physical_device_desc: "device: 0, name: TITAN Xp, pci bus id: 0000:1d:00.0, compute capability: 6.1"
+, name: "/device:XLA_GPU:0"
+device_type: "XLA_GPU"
+memory_limit: 17179869184
+locality {
+}
+incarnation: 18177657216201739982
+physical_device_desc: "device: XLA_GPU device"
+]
+2020-7-20 5:8:57.97: CONFIG: The configuration file for the [model] given is: /vol/bitbucket/lizhq219/deepMedicSemi/deepmedic_semisuper/deepmedic/examples/configFiles/deepMedic/model/modelConfig_small_5train_semi.cfg
+2020-7-20 5:8:57.97: =============================================================
+2020-7-20 5:8:57.97: ========== PARAMETERS FOR MAKING THE ARCHITECTURE ===========
+2020-7-20 5:8:57.97: =============================================================
+2020-7-20 5:8:57.97: CNN model's name = deepMedic_small_5train_semi
+2020-7-20 5:8:57.97: ~~~~~~~~~~~~~~~~~~Model parameters~~~~~~~~~~~~~~~~
+2020-7-20 5:8:57.97: Number of Classes (including background) = 14
+2020-7-20 5:8:57.97: ~~Normal Pathway~~
+2020-7-20 5:8:57.97: Number of Input Channels = 1
+2020-7-20 5:8:57.97: Number of Layers = 8
+2020-7-20 5:8:57.97: Number of Feature Maps per layer = [12, 15, 18, 21, 24, 27, 30, 33]
+2020-7-20 5:8:57.97: Kernel Dimensions per layer = [[3, 3, 3], [3, 3, 3], [3, 3, 3], [3, 3, 3], [3, 3, 3], [3, 3, 3], [3, 3, 3], [3, 3, 3]]
+2020-7-20 5:8:57.97: Padding mode of convs per layer = ['VALID', 'VALID', 'VALID', 'VALID', 'VALID', 'VALID', 'VALID', 'VALID']
+2020-7-20 5:8:57.97: Residual connections added at the output of layers (indices from 0) = [3, 5, 7]
+2020-7-20 5:8:57.97: Layers that will be made of Lower Rank (indices from 0) = []
+2020-7-20 5:8:57.97: Lower Rank layers will be made of rank = []
+2020-7-20 5:8:57.97: ~~Subsampled Pathway~~
+2020-7-20 5:8:57.97: Use subsampled Pathway = True
+2020-7-20 5:8:57.97: Number of subsampled pathways that will be built = 2
+2020-7-20 5:8:57.97: Number of Layers (per sub-pathway) = [8, 8]
+2020-7-20 5:8:57.97: Number of Feature Maps per layer (per sub-pathway) = [[12, 15, 18, 21, 24, 27, 30, 33], [12, 15, 18, 21, 24, 27, 30, 33]]
+2020-7-20 5:8:57.97: Kernel Dimensions per layer = [[3, 3, 3], [3, 3, 3], [3, 3, 3], [3, 3, 3], [3, 3, 3], [3, 3, 3], [3, 3, 3], [3, 3, 3]]
+2020-7-20 5:8:57.97: Padding mode of convs per layer = ['VALID', 'VALID', 'VALID', 'VALID', 'VALID', 'VALID', 'VALID', 'VALID']
+2020-7-20 5:8:57.97: Subsampling Factor per dimension (per sub-pathway) = [[3, 3, 3], [5, 5, 5]]
+2020-7-20 5:8:57.97: Residual connections added at the output of layers (indices from 0) = [3, 5, 7]
+2020-7-20 5:8:57.97: Layers that will be made of Lower Rank (indices from 0) = []
+2020-7-20 5:8:57.97: Lower Rank layers will be made of rank = []
+2020-7-20 5:8:57.97: ~~Fully Connected Pathway~~
+2020-7-20 5:8:57.98: Number of additional FC layers (Excluding the Classif. Layer) = 2
+2020-7-20 5:8:57.98: Number of Feature Maps in the additional FC layers = [150, 150]
+2020-7-20 5:8:57.98: Padding mode of convs per layer = ['mirror', None, None]
+2020-7-20 5:8:57.98: Residual connections added at the output of layers (indices from 0) = [1]
+2020-7-20 5:8:57.98: Layers that will be made of Lower Rank (indices from 0) = []
+2020-7-20 5:8:57.98: Dimensions of Kernels in final FC path before classification = [[3, 3, 3], [1, 1, 1], [1, 1, 1]]
+2020-7-20 5:8:57.98: ~~Size Of Image Segments~~
+2020-7-20 5:8:57.98: Size of Segments for Training = [37, 37, 37]
+2020-7-20 5:8:57.98: Size of Segments for Validation = [17, 17, 17]
+2020-7-20 5:8:57.98: Size of Segments for Testing = [45, 45, 45]
+2020-7-20 5:8:57.98: ~~Dropout Rates~~
+2020-7-20 5:8:57.98: Drop.R. for each layer in Normal Pathway = []
+2020-7-20 5:8:57.98: Drop.R. for each layer in Subsampled Pathway = []
+2020-7-20 5:8:57.98: Drop.R. for each layer in FC Pathway (additional FC layers + Classific.Layer at end) = [0.0, 0.5, 0.5]
+2020-7-20 5:8:57.98: ~~Weight Initialization~~
+2020-7-20 5:8:57.98: Initialization method and params for the conv kernel weights = ['fanIn', 2]
+2020-7-20 5:8:57.98: ~~Activation Function~~
+2020-7-20 5:8:57.98: Activation function to use = prelu
+2020-7-20 5:8:57.98: ~~Batch Normalization~~
+2020-7-20 5:8:57.98: Apply BN straight on pathways' inputs (eg straight on segments) = [False, False, True]
+2020-7-20 5:8:57.98: Batch Normalization uses a rolling average for inference, over this many batches = 60
+2020-7-20 5:8:57.98: ========== Done with printing session's parameters ==========
+2020-7-20 5:8:57.98: =============================================================
+2020-7-20 5:8:57.98: CONFIG: The configuration file for the [session] was loaded from: /vol/bitbucket/lizhq219/deepMedicSemi/deepmedic_semisuper/deepmedic/examples/configFiles/deepMedic/train/trainConfig_small_5train_semi.cfg
+2020-7-20 5:8:58.04: 
+2020-7-20 5:8:58.04: ERROR: Caught exception from main process: object of type 'NoneType' has no len()
+2020-7-20 5:8:58.04: Traceback (most recent call last):
+  File "/vol/bitbucket/lizhq219/deepMedicSemi/deepmedic_semisuper/deepmedic/deepMedicRun", line 175, in <module>
+    _ = session.compile_session_params_from_cfg(model_params)
+  File "/vol/bitbucket/lizhq219/deepMedicSemi/deepmedic_semisuper/deepmedic/deepmedic/frontEnd/trainSession.py", line 85, in compile_session_params_from_cfg
+    self._cfg)
+  File "/vol/bitbucket/lizhq219/deepMedicSemi/deepmedic_semisuper/deepmedic/deepmedic/frontEnd/configParsing/trainSessionParams.py", line 448, in __init__
+    self.n_cases_UL_tr = len(self.ulChannels_fpaths_tr)
+TypeError: object of type 'NoneType' has no len()
+
+2020-7-20 5:8:58.04: Finished.
