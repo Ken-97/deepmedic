@@ -183,6 +183,9 @@ def do_training(sessionTf,
     # This created problems in the GPU when cnmem is used. Not sure this is needed with Tensorflow. Probably.
     cnn3dWrapper = CnnWrapperForSampling(cnn3d)
 
+    if paths_per_ULchan_per_subj_train is not None:
+        print("Unlabelled data reveived.")
+
     args_for_sampling_tr = (log,
                             "train",
                             num_parallel_proc_sampling,
