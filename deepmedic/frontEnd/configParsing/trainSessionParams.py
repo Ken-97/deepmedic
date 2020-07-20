@@ -445,7 +445,7 @@ class TrainSessionParameters(object):
         # Others useful internally or for reporting:
         self.n_cases_tr = len(self.channels_fpaths_tr)
         self.n_cases_val = len(self.channels_fpaths_val)
-        self.n_cases_UL_tr = len(self.ulChannels_fpaths_tr)
+        self.n_cases_UL_tr = len(self.ulChannels_fpaths_tr) if cfg[cfg.UL_CHANNELS_TR] is not None else None
         
         # ========= HIDDENS =============
         # no config allowed for these at the moment:
