@@ -114,7 +114,10 @@ class Trainer(object):
         if "dsc" in self._losses_and_weights and self._losses_and_weights["dsc"] is not None:
             log.print3("COST: Using dsc loss with weight: " +str(self._losses_and_weights["dsc"]))
             cost += self._losses_and_weights["dsc"] * cfs.dsc(p_y_given_x, y_gt)
-            
+        if "semi_loss" in self._losses_and_weights and self._losses_and_weights["semi_loss"] is not None:
+            log.print3("COST: Using semi loss with weight: " +str(self._losses_and_weights["semi_loss"]))
+            w_per_cl_vec = self._compute_w_per_class_vector_for_xentr(self._net.num_classes, y_gt)
+            cost += self._losses_and_weights["semi_loss"] * cfs.semi_loss(p_y_given_x, y_gt, w_per_cl_vec)
         cost_L1_reg = self._L1_reg_weight * cfs.cost_L1(self._net.params_for_L1_L2_reg())
         cost_L2_reg = self._L2_reg_weight * cfs.cost_L2(self._net.params_for_L1_L2_reg())
         cost = cost + cost_L1_reg + cost_L2_reg

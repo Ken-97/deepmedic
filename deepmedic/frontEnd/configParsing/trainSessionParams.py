@@ -67,6 +67,15 @@ class TrainSessionParameters(object):
     errReqGtTr = errorRequireGtLabelsTraining
 
     @staticmethod
+    def errorRequireGtUnLabelledChannelsTrainingGtLabels():
+        print(
+            "You have provided paths to unlabelled data channels but there is "
+            "no paths to their corresponding labels!")
+        exit(1)
+
+    errReqGtUnlblChansTr = errorRequireGtUnLabelledChannelsTrainingGtLabels
+
+    @staticmethod
     def errorRequireULChannelsTraining():
         print(
             "ERROR: Parameter \"ULChannelsTraining\" needed but not provided in config file."
@@ -138,6 +147,18 @@ class TrainSessionParameters(object):
             "is set to True)! You will need to provide the path to a file that lists where the GT labels for each "
             "validation case can be found. The corresponding parameter must be provided in the format: "
             "gtLabelsValidation = \"path-to-file-that-lists-GT-labels-for-every-case\" (python style string). Exiting.")
+        exit(1)
+
+    @staticmethod
+    def errorReqULChannsVal():
+        print("ERROR: Parameter \" unlabelledChannelsValidation \" was not provided.")
+        exit(1)
+
+    errReqULChansVal = errorReqULChannsVal
+
+    @staticmethod
+    def errorReqULGtLabelsVal():
+        print("ERROR: Parameter \" gtUnlabelledChannelsValidation \" was not provided")
         exit(1)
 
     @staticmethod
@@ -228,6 +249,7 @@ class TrainSessionParameters(object):
              self.gt_fpaths_tr,
              self.roi_fpaths_tr,
              self.ulChannels_fpaths_tr,
+             self.gt_ulChannels_fpaths_tr,
              _) = get_paths_from_df(self.log, self.dataframe_tr, os.path.dirname(self.csv_fname_train), req_gt=True)
         else:
             self.csv_fname_train = None
@@ -236,10 +258,14 @@ class TrainSessionParameters(object):
                 self.errReqChansTr()
             if cfg[cfg.GT_LBLS_TR] is None:
                 self.errReqGtTr()
+            if cfg[cfg.UL_CHANNELS_TR] is not None and cfg[cfg.UL_LBLS_TR] is None:
+                self.errReqGtUnlblChansTr()
 
             self.channels_fpaths_tr = parse_fpaths_of_channs_from_filelists(cfg[cfg.CHANNELS_TR], abs_path_cfg)
             self.ulChannels_fpaths_tr = parse_fpaths_of_channs_from_filelists(cfg[cfg.UL_CHANNELS_TR], abs_path_cfg) \
                 if cfg[cfg.UL_CHANNELS_TR] is not None else None
+            self.gt_ulChannels_fpaths_tr = parse_fpaths_of_channs_from_filelists(cfg[cfg.UL_LBLS_TR], abs_path_cfg) \
+                if cfg[cfg.UL_LBLS_TR] is not None else None
             self.gt_fpaths_tr = parse_filelist(abs_from_rel_path(cfg[cfg.GT_LBLS_TR], abs_path_cfg), make_abs=True)
             self.roi_fpaths_tr = parse_filelist(abs_from_rel_path(cfg[cfg.ROIS_TR], abs_path_cfg), make_abs=True) \
                 if cfg[cfg.ROIS_TR] is not None else None
@@ -331,6 +357,8 @@ class TrainSessionParameters(object):
             self.gt_fpaths_val = None
             self.roi_fpaths_val = None
             self.out_preds_fnames_val = None
+            self.ulChannels_fpaths_val = []
+            self.gt_ulChannels_fpaths_val = None
         elif cfg[cfg.DATAFRAME_VAL] is not None:  # doing one of validations, and given dataframe.
             self.csv_fname_val = abs_from_rel_path(cfg[cfg.DATAFRAME_VAL], abs_path_cfg)
             try:
@@ -340,7 +368,9 @@ class TrainSessionParameters(object):
             (self.channels_fpaths_val,
              self.gt_fpaths_val,
              self.roi_fpaths_val,
-             self.out_preds_fnames_val) = get_paths_from_df(self.log,
+             self.out_preds_fnames_val,
+             self.ulChannels_fpaths_val,
+             self.gt_ulChannels_fpaths_val) = get_paths_from_df(self.log,
                                                             self.dataframe_val,
                                                             os.path.dirname(self.csv_fname_val),
                                                             req_gt=True)
@@ -352,8 +382,17 @@ class TrainSessionParameters(object):
             else:
                 self.errReqChannsVal()
 
+            if cfg[cfg.UL_CHANNELS_VAL]:
+                self.ulChannels_fpaths_val = parse_fpaths_of_channs_from_filelists(
+                    cfg[cfg.UL_CHANNELS_VAL], abs_path_cfg)
+            else:
+                self.errReqULChansVal()
+
             self.gt_fpaths_val = parse_filelist(abs_from_rel_path(cfg[cfg.GT_LBLS_VAL], abs_path_cfg), make_abs=True) \
                 if cfg[cfg.GT_LBLS_VAL] is not None else self.errorReqGtLabelsVal()
+
+            self.gt_ulChannels_fpaths_val = parse_filelist(abs_from_rel_path(cfg[cfg.UL_LBLS_VAL], abs_path_cfg), make_abs=True) \
+                if cfg[cfg.UL_LBLS_VAL] is not None else self.errorReqULGtLabelsVal()
             self.roi_fpaths_val = parse_filelist(abs_from_rel_path(cfg[cfg.ROIS_VAL], abs_path_cfg), make_abs=True) \
                 if cfg[cfg.ROIS_VAL] is not None else None
             self.out_preds_fnames_val = parse_filelist(abs_from_rel_path(cfg[cfg.FNAMES_PREDS_VAL], abs_path_cfg)) \
@@ -520,8 +559,9 @@ class TrainSessionParameters(object):
 
         self.losses_and_weights = cfg[cfg.LOSSES_WEIGHTS] if cfg[cfg.LOSSES_WEIGHTS] is not None else {"xentr": 1.0,
                                                                                                        "iou": None,
-                                                                                                       "dsc": None}
-        assert True in [self.losses_and_weights[k] is not None for k in ["xentr", "iou", "dsc"]]
+                                                                                                       "dsc": None,
+                                                                                                       "semi_loss": None}
+        assert True in [self.losses_and_weights[k] is not None for k in ["xentr", "iou", "dsc", "semi_loss"]]
 
         self._backwards_compat_with_deprecated_cfg(cfg)
 
@@ -592,6 +632,7 @@ class TrainSessionParameters(object):
         logPrint("Filepaths to Ground-Truth labels of the Training Cases = " + str(self.gt_fpaths_tr))
         logPrint("Filepaths to ROI Masks of the Training Cases = " + str(self.roi_fpaths_tr))
         logPrint("Filepaths to Unlabelled Channels of the Training Cases = " + str(self.ulChannels_fpaths_tr))
+        logPrint("Filepaths to the labels of Unlabelled Channels of the Training Cases = " + str(self.gt_ulChannels_fpaths_val))
 
         logPrint("~~ Sampling (train) ~~")
         logPrint("Type of Sampling = " + str(self.sampling_type_inst_tr.get_type_as_str()) +
@@ -647,6 +688,8 @@ class TrainSessionParameters(object):
         logPrint("Filepaths to Channels of Validation Cases = " + str(self.channels_fpaths_val))
         logPrint("Filepaths to Ground-Truth labels of the Validation Cases = " + str(self.gt_fpaths_val))
         logPrint("Filepaths to ROI masks for Validation Cases = " + str(self.roi_fpaths_val))
+        logPrint("Filepaths to Channels of Unlabelled Validation Cases = " + str(self.ulChannels_fpaths_val))
+        logPrint("Filepaths to Ground-Truth labels of the unlabelled Validation Cases = " + str(self.gt_ulChannels_fpaths_val))
 
         logPrint("~~~~~~~Validation on Samples throughout Training~~~~~~~")
         logPrint("Number of Segments loaded per subepoch for Validation = " + str(self.n_samples_per_subep_val))
@@ -767,7 +810,10 @@ class TrainSessionParameters(object):
                 self.norm_prms,
 
                 # -------- Semi-Supervised ------
-                self.ulChannels_fpaths_tr
+                self.ulChannels_fpaths_tr,
+                self.gt_ulChannels_fpaths_tr,
+                self.ulChannels_fpaths_val,
+                self.gt_ulChannels_fpaths_val
                 ]
         return args
 

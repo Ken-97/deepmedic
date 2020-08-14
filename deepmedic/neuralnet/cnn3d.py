@@ -111,7 +111,7 @@ class Cnn3d(object):
         return self._feeds_main[str_train_val_test]
     
     
-    def setup_ops_n_feeds_to_train(self, log, inp_plchldrs, p_y_given_x, total_cost, updates_of_params_wrt_total_cost) :
+    def setup_ops_n_feeds_to_train(self, log, inp_plchldrs, p_y_given_x, total_cost, semi_cost, updates_of_params_wrt_total_cost) :
         log.print3("...Building the training function...")
         
         y_gt = self._output_gt_tensor_feeds['train']['y_gt']
@@ -124,6 +124,7 @@ class Cnn3d(object):
         log.print3("...Collecting ops and feeds for training...")
         
         self._ops_main['train']['cost'] = total_cost
+        self._ops_main['train']['semi_cost'] = semi_cost
         self._ops_main['train']['list_rp_rn_tp_tn'] = self.finalTargetLayer.get_rp_rn_tp_tn(p_y_given_x, y_gt)
         self._ops_main['train']['updates_grouped_op'] = updates_grouped_op
         
@@ -420,5 +421,4 @@ class Cnn3d(object):
         n_unpred_vox = [inp_dims_hr_path[d] - outp_dims[d] for d in range(3)]
         unpred_margin = [[n_unpred_vox[d]//2, n_unpred_vox[d]-n_unpred_vox[d]//2] for d in range(3)]
         return unpred_margin
-    
     

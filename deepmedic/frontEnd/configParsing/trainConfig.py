@@ -27,6 +27,7 @@ class TrainConfig(Config):
     GT_LBLS_TR = "gtLabelsTraining"
     ROIS_TR = "roiMasksTraining"
     UL_CHANNELS_TR = "unlabelledChannelsTraining"
+    UL_LBLS_TR = "gtUnlabelledChannelsTraining"
     
     # ~~~~ Sampling (training) ~~~~~
     TYPE_OF_SAMPLING_TR = "typeOfSamplingForTraining"
@@ -66,6 +67,8 @@ class TrainConfig(Config):
     ROIS_VAL = "roiMasksValidation"
     NUM_VAL_SEGMS_LOADED_PERSUB = "numberValidationSegmentsLoadedOnGpuPerSubep"  # For val on samples.
     BATCHSIZE_VAL_SAMPL = "batchsize_val_samples"
+    UL_CHANNELS_VAL = "unlabelledChannelsValidation"
+    UL_LBLS_VAL = "gtUnlabelledChannelsValidation"
     
     # ~~~~~~~~ Sampling (validation) ~~~~~~~~~~~~
     TYPE_OF_SAMPLING_VAL = "typeOfSamplingForVal"

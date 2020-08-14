@@ -118,8 +118,17 @@ class TrainSession(Session):
             with tf.compat.v1.variable_scope("trainer"):
                 self._log.print3("=========== Building Trainer ===========\n")
                 trainer = Trainer(*(self._params.get_args_for_trainer() + [cnn3d]))
+                # build a semi-supervised trainer, here I can add a If-then statement to judge whether we need a semi trainer
+                # here a new trainer is claimed. This implementation is not good. I shall encapsulate it in some way.
+                semiargs = self._params.get_args_for_trainer()
+                semiargs[2] = {"xentr": None, "iou": None, "dsc": None, "semi_loss": 1.0}
+                semiargs = semiargs + [cnn3d]
+                semi_trainner = Trainer(*(semiargs))
+                # semi-supervised trainer built.
                 trainer.compute_costs(self._log, p_y_given_x_train)
+                semi_trainner.compute_costs(self._log, p_y_given_x_train) # For semi-supervised learning
                 trainer.create_optimizer(*self._params.get_args_for_optimizer())  # Trainer and net connect here.
+                semi_trainner.create_optimizer(*self._params.get_args_for_optimizer()) # For semi-supervised learning
 
             tensorboard_loggers = self.create_tensorboard_loggers(['train', 'val'],
                                                                   graphTf,
@@ -132,6 +141,7 @@ class TrainSession(Session):
                                              inp_plchldrs_train,
                                              p_y_given_x_train,
                                              trainer.get_total_cost(),
+                                             semi_trainner.get_total_cost(), # for semi-supervised learning
                                              trainer.get_param_updates_wrt_total_cost()  # list of ops
                                              )
 

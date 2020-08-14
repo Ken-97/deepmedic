@@ -60,7 +60,9 @@ def get_samples_for_subepoch(log,
                              pad_input_imgs,
                              norm_prms,
                              augm_img_prms,
-                             augm_sample_prms):
+                             augm_sample_prms,
+                             paths_per_ul_chan_per_subj,
+                             paths_to_lbls_ul_chan_per_subj):
     # train_val_or_test: 'train', 'val' or 'test'
     # Returns: channs_of_samples_arr_per_path - List of arrays [N_samples, Channs, R,C,Z], one per pathway.
     #          lbls_predicted_part_of_samples_arr - Array of shape: [N_samples, R_out, C_out, Z_out)
@@ -74,19 +76,28 @@ def get_samples_for_subepoch(log,
                " :=:=:=:=:=:=: Starting to sample for next [" + tr_or_val_str_log + "]... :=:=:=:=:=:=:")
 
     n_total_subjects = len(paths_per_chan_per_subj)
+    n_total_unlabelled_subjects = len(paths_per_ul_chan_per_subj)
     idxs_of_subjs_for_subep = choose_random_subjects(n_total_subjects, max_n_cases_per_subep)
+    idxs_of_ul_subjs_fot_subep = choose_random_subjects(n_total_unlabelled_subjects, max_n_cases_per_subep)
 
     log.print3(sampler_id + " Out of [" + str(n_total_subjects) + "] subjects given for [" +
                tr_or_val_str_log + "], we will sample from maximum [" + str(max_n_cases_per_subep) +
                "] per subepoch.")
     log.print3(sampler_id + " Shuffled indices of subjects that were randomly chosen: " + str(idxs_of_subjs_for_subep))
+    log.print3(sampler_id + "Out of [" + str(n_total_unlabelled_subjects) + "] unlabelled subjects given for [" +
+               tr_or_val_str_log + "], we will sample from maximum [" + str(max_n_cases_per_subep) +
+               "] per subepoch.")
+    log.print3(sampler_id + "Shuffled indices of unlabelled subjects that were randomly chosen: " + str(idxs_of_ul_subjs_fot_subep))
 
     # List, with [numberOfPathwaysThatTakeInput] sublists.
     # Each sublist is list of [partImagesLoadedPerSubepoch] arrays [channels, R,C,Z].
     channs_of_samples_per_path = [[] for i in range(cnn3d.getNumPathwaysThatRequireInput())]
+    channs_of_unlabelled_samples_per_path = [[] for i in range(cnn3d.getNumPathwaysThatRequireInput())]
     lbls_predicted_part_of_samples = []  # Labels only for the central/predicted part of segments.
+    lbls_predicted_part_of_unlabelled_samples = [] # Labels only for the central/predicted part of unlabelled segments
     # Can be different than max_n_cases_per_subep, because of available images number.
-    n_subjs_for_subep = len(idxs_of_subjs_for_subep)
+    n_subjs_for_subep = len(idxs_of_subjs_for_subep) # the original formula, there is no need to change it, cause the process is processed parallelly.
+    # n_subjs_for_subep = len(idxs_of_subjs_for_subep) + len(idxs_of_ul_subjs_fot_subep)
 
     # Get how many samples I should get from each subject.
     n_samples_per_subj = get_n_samples_per_subj(n_samples_per_subep, n_subjs_for_subep)
@@ -114,8 +125,34 @@ def get_samples_for_subepoch(log,
                          unpred_margin
                          ]
 
+    # for semi-supervised learning
+    args_semi_sampling_job = [log,
+                              train_val_or_test,
+                              run_input_checks,
+                              cnn3d,
+                              sampling_type,
+                              paths_per_ul_chan_per_subj,
+                              paths_to_lbls_ul_chan_per_subj,
+                              paths_to_masks_per_subj,
+                              paths_to_wmaps_per_sampl_cat_per_subj,
+                              # Pre-processing:
+                              pad_input_imgs,
+                              norm_prms,
+                              augm_img_prms,
+                              augm_sample_prms,
+
+                              n_subjs_for_subep,
+                              idxs_of_subjs_for_subep,
+                              n_samples_per_subj,
+                              inp_shapes_per_path,
+                              outp_pred_dims,
+                              unpred_margin
+                              ]
+
     log.print3(sampler_id + " Will sample from [" + str(n_subjs_for_subep) +
                "] subjects for next " + tr_or_val_str_log + "...")
+    log.print3(sampler_id + " Will sample from [" + str(paths_per_ul_chan_per_subj) +
+               "] unlabelled subjects for next " + tr_or_val_str_log + "...") # for semi-supervised learning
 
     jobs_idxs_to_do = list(range(n_subjs_for_subep))  # One job per subject.
 
@@ -123,14 +160,19 @@ def get_samples_for_subepoch(log,
         for job_idx in jobs_idxs_to_do:
             (channs_samples_from_job_per_path,
              lbls_predicted_part_samples_from_job) = load_subj_and_sample(*([job_idx] + args_sampling_job))
+            (channs_unlabelled_samples_from_job_per_path,
+             lbls_predicted_part_unlabelled_samples_from_job) = load_subj_and_sample(*([job_idx] + args_semi_sampling_job)) # for semi-supervised learning
             for pathway_i in range(cnn3d.getNumPathwaysThatRequireInput()):
                 # concat does not copy.
                 channs_of_samples_per_path[pathway_i] += channs_samples_from_job_per_path[pathway_i]
+                channs_of_unlabelled_samples_per_path[pathway_i] += channs_unlabelled_samples_from_job_per_path[pathway_i] # for semi-supervised learning
             lbls_predicted_part_of_samples += lbls_predicted_part_samples_from_job  # concat does not copy.
+            lbls_predicted_part_of_unlabelled_samples += lbls_predicted_part_unlabelled_samples_from_job # for semi-supervised learning
 
     else:  # Parallelize sampling from each subject
         while len(jobs_idxs_to_do) > 0:  # While jobs remain.
             jobs = collections.OrderedDict()
+            semi_jobs = collections.OrderedDict() # for semi-supervised learning
 
             log.print3(sampler_id + " ******* Spawning children processes to sample from [" +
                        str(len(jobs_idxs_to_do)) + "] subjects*******")
@@ -143,6 +185,7 @@ def get_samples_for_subepoch(log,
             try:  # Stacktrace in MULTIPR: https://jichu4n.com/posts/python-multiprocessing-and-exceptions/
                 for job_idx in jobs_idxs_to_do:  # submit jobs
                     jobs[job_idx] = mp_pool.apply_async(load_subj_and_sample, ([job_idx] + args_sampling_job))
+                    semi_jobs[job_idx] = mp_pool.apply_async(load_subj_and_sample, ([job_idx] + args_semi_sampling_job)) # for semi-supervised learning
 
                 # copy with list(...), so that this loops normally even if something is removed from list.
                 for job_idx in list(jobs_idxs_to_do):
@@ -150,11 +193,15 @@ def get_samples_for_subepoch(log,
                         # timeout in case process for some reason never started (happens in py3)
                         (channs_samples_from_job_per_path,
                          lbls_predicted_part_samples_from_job) = jobs[job_idx].get(timeout=60)
+                        (channs_unlabelled_samples_from_job_per_path,
+                         lbls_predicted_part_unlabelled_samples_from_job) = semi_jobs[job_idx].get(timeout=60) # for semi-supervised learning
                         for pathway_i in range(cnn3d.getNumPathwaysThatRequireInput()):
                             # concat does not copy.
                             channs_of_samples_per_path[pathway_i] += channs_samples_from_job_per_path[pathway_i]
+                            channs_of_unlabelled_samples_per_path[pathway_i] += channs_unlabelled_samples_from_job_per_path[pathway_i] # for semi-supervised learning
                         # concat does not copy.
                         lbls_predicted_part_of_samples += lbls_predicted_part_samples_from_job
+                        lbls_predicted_part_of_unlabelled_samples += lbls_predicted_part_unlabelled_samples_from_job # for semi-supervised learning
                         jobs_idxs_to_do.remove(job_idx)
                     except multiprocessing.TimeoutError:
                         log.print3(sampler_id +\
@@ -187,6 +234,8 @@ def get_samples_for_subepoch(log,
     # Got all samples for subepoch. Now shuffle them, together segments and their labels.
     (channs_of_samples_per_path,
      lbls_predicted_part_of_samples) = shuffle_samples(channs_of_samples_per_path, lbls_predicted_part_of_samples)
+    (channs_of_unlabelled_samples_per_path,
+     lbls_predicted_part_of_unlabelled_samples) = shuffle_samples(channs_of_unlabelled_samples_per_path, lbls_predicted_part_of_unlabelled_samples) # for semi-supervised learning
     log.print3(sampler_id + " TIMING: Sampling for next [" + tr_or_val_str_log +
                "] lasted: {0:.1f}".format(time.time() - start_time_sampling) + " secs.")
 
@@ -195,9 +244,13 @@ def get_samples_for_subepoch(log,
     channs_of_samples_arr_per_path = [np.asarray(channs_of_samples_for_path, dtype="float32") for
                                       channs_of_samples_for_path in channs_of_samples_per_path]
 
-    lbls_predicted_part_of_samples_arr = np.asarray(lbls_predicted_part_of_samples, dtype="int32")
+    channs_of_unlabelled_samples_arr_per_path = [np.asarray(channs_of_unlabelled_samples_for_path, dtype="float32") for
+                                                 channs_of_unlabelled_samples_for_path in channs_of_unlabelled_samples_per_path] # for semi-supervised learning
 
-    return channs_of_samples_arr_per_path, lbls_predicted_part_of_samples_arr
+    lbls_predicted_part_of_samples_arr = np.asarray(lbls_predicted_part_of_samples, dtype="int32")
+    lbls_predicted_part_of_unlabelled_samples_arr = np.asarray(lbls_predicted_part_of_unlabelled_samples, dtype="int32") # for semi-supervised learning
+
+    return channs_of_samples_arr_per_path, lbls_predicted_part_of_samples_arr, channs_of_unlabelled_samples_arr_per_path, lbls_predicted_part_of_unlabelled_samples_arr
 
 
 def init_sampling_proc():
