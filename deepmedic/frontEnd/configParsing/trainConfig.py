@@ -55,8 +55,10 @@ class TrainConfig(Config):
     # Exponential
     EXPON_SCH = "paramsForExpSchedForLrAndMom"
     # ~~~~ Data Augmentation~~~
-    AUGM_IMG_PRMS_TR = "augm_img_prms_tr"
-    AUGM_SAMPLE_PRMS_TR = "augm_sample_prms_tr"
+    AUGM_IMG_PRMS_TR = "augmentation_image"
+    AUGM_SAMPLE_PRMS_TR = "augmentation_sample"
+    AUGM_UL_IMG_PRMS_TR = "augmentation_ulb_image"
+    AUGM_UL_SAMPLE_PRMS_TR = "augmentation_ulb_sample"
     
     # ============== VALIDATION ===================
     PERFORM_VAL_SAMPLES = "performValidationOnSamplesThroughoutTraining"

@@ -340,6 +340,16 @@ class TrainSessionParameters(object):
                 # For exact form of parameters, see ./deepmedic/dataManagement/augmentation.py
                 self.augm_sample_prms_tr[key] = cfg[cfg.AUGM_SAMPLE_PRMS_TR][key]
 
+        self.augm_ul_img_prms_tr = {'affine': None}
+        if cfg[cfg.AUGM_UL_IMG_PRMS_TR] is not None:
+            self.augm_ul_img_prms_tr['affine'] = AugmenterAffineParams(cfg[cfg.AUGM_UL_IMG_PRMS_TR]['affine'])
+
+        self.augm_ul_sample_prms_tr = {'hist_dist': None, 'reflect': None, 'rotate90': None}
+        if cfg[cfg.AUGM_UL_SAMPLE_PRMS_TR] is not None:
+            for key in cfg[cfg.AUGM_UL_SAMPLE_PRMS_TR]:
+                # For exact form of parameters, see ./deepmedic/dataManagement/augmentation.py
+                self.augm_sample_prms_tr[key] = cfg[cfg.AUGM_UL_SAMPLE_PRMS_TR][key]
+
         # ===================VALIDATION========================
         self.val_on_samples_during_train = \
             cfg[cfg.PERFORM_VAL_SAMPLES] if cfg[cfg.PERFORM_VAL_SAMPLES] is not None else False
@@ -791,6 +801,8 @@ class TrainSessionParameters(object):
                 # -------Data Augmentation-------
                 self.augm_img_prms_tr,
                 self.augm_sample_prms_tr,
+                self.augm_ul_img_prms_tr,
+                self.augm_ul_sample_prms_tr,
 
                 # --- Validation on whole volumes ---
                 self.val_on_whole_volumes,

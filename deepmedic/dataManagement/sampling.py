@@ -61,6 +61,8 @@ def get_samples_for_subepoch(log,
                              norm_prms,
                              augm_img_prms,
                              augm_sample_prms,
+                             augm_ul_img_prms,
+                             augm_ul_sample_prms,
                              paths_per_ul_chan_per_subj,
                              paths_to_lbls_ul_chan_per_subj):
     # train_val_or_test: 'train', 'val' or 'test'
@@ -138,8 +140,8 @@ def get_samples_for_subepoch(log,
                               # Pre-processing:
                               pad_input_imgs,
                               norm_prms,
-                              augm_img_prms,
-                              augm_sample_prms,
+                              augm_ul_img_prms,
+                              augm_ul_sample_prms,
 
                               n_subjs_for_subep,
                               idxs_of_subjs_for_subep,

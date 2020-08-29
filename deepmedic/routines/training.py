@@ -157,6 +157,8 @@ def do_training(sessionTf,
                 # -------Data Augmentation-------
                 augm_img_prms,
                 augm_sample_prms,
+                augm_ul_img_prms,
+                augm_ul_sample_prms,
 
                 # Validation
                 val_on_whole_volumes,
@@ -213,6 +215,8 @@ def do_training(sessionTf,
                             norm_prms,
                             augm_img_prms,
                             augm_sample_prms,
+                            augm_ul_img_prms,
+                            augm_ul_sample_prms,
                             paths_per_ULchan_per_subj_train, # unlabelled data
                             paths_per_lbls_ULchan_per_subj_train # gt of unlabelled data
                             )
