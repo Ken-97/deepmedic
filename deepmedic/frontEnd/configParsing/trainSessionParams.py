@@ -331,7 +331,7 @@ class TrainSessionParameters(object):
         # Image level
         self.augm_img_prms_tr = {'affine': None}  # If var is None, no augm at all.
         if cfg[cfg.AUGM_IMG_PRMS_TR] is not None:
-            self.augm_img_prms_tr['affine'] = AugmenterAffineParams(cfg[cfg.AUGM_IMG_PRMS_TR]['affine'])
+            self.augm_img_prms_tr['affine'] = AugmenterAffineParams(cfg[cfg.AUGM_IMG_PRMS_TR]['RandomAffineTransformation'])
 
         # Patch/Segment level
         self.augm_sample_prms_tr = {'hist_dist': None, 'reflect': None, 'rotate90': None}
@@ -342,7 +342,7 @@ class TrainSessionParameters(object):
 
         self.augm_ul_img_prms_tr = {'affine': None}
         if cfg[cfg.AUGM_UL_IMG_PRMS_TR] is not None:
-            self.augm_ul_img_prms_tr['affine'] = AugmenterAffineParams(cfg[cfg.AUGM_UL_IMG_PRMS_TR]['affine'])
+            self.augm_ul_img_prms_tr['affine'] = AugmenterAffineParams(cfg[cfg.AUGM_UL_IMG_PRMS_TR]['RandomAffineTransformation'])
 
         self.augm_ul_sample_prms_tr = {'hist_dist': None, 'reflect': None, 'rotate90': None}
         if cfg[cfg.AUGM_UL_SAMPLE_PRMS_TR] is not None:
