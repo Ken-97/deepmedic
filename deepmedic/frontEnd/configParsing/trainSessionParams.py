@@ -264,7 +264,8 @@ class TrainSessionParameters(object):
             self.channels_fpaths_tr = parse_fpaths_of_channs_from_filelists(cfg[cfg.CHANNELS_TR], abs_path_cfg)
             self.ulChannels_fpaths_tr = parse_fpaths_of_channs_from_filelists(cfg[cfg.UL_CHANNELS_TR], abs_path_cfg) \
                 if cfg[cfg.UL_CHANNELS_TR] is not None else None
-            self.gt_ulChannels_fpaths_tr = parse_filelist(abs_from_rel_path(cfg[cfg.UL_LBLS_TR], abs_path_cfg), make_abs=True)
+            self.gt_ulChannels_fpaths_tr = parse_filelist(abs_from_rel_path(cfg[cfg.UL_LBLS_TR], abs_path_cfg), make_abs=True) \
+                if cfg[cfg.UL_LBLS_TR] is not None else None
             self.gt_fpaths_tr = parse_filelist(abs_from_rel_path(cfg[cfg.GT_LBLS_TR], abs_path_cfg), make_abs=True)
             self.roi_fpaths_tr = parse_filelist(abs_from_rel_path(cfg[cfg.ROIS_TR], abs_path_cfg), make_abs=True) \
                 if cfg[cfg.ROIS_TR] is not None else None
