@@ -25,7 +25,7 @@ def semi_loss(p_y_given_x_train, y_gt, weightPerClass ,eps=1e-5):
 
     num_samples = tf.cast(tf.reduce_prod(tf.shape(y_gt)), "float32")
 
-    return - (1. / num_samples) * tf.reduce_sum(weighted_log_p_y_given_x_train * y_one_hot)
+    return - (1. / num_samples) * tf.reduce_sum(weighted_log_p_y_given_x_train * log_p_y_given_x_train)
 
 
 def x_entr( p_y_given_x_train, y_gt, weightPerClass, eps=1e-6 ):
